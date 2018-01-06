@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const csvWriter = require('csv-write-stream');
 const fs = require('fs');
+const async = require('async');
 
 const options = {
   separator: ',',
@@ -8,6 +9,7 @@ const options = {
   headers: [
     'Client id',
     'Client name',
+    'Applications',
     '2014 - Bank overdraft / cash credit account',
     '2014 - Sundry debtors',
     '2014 - Inventory',
@@ -40,20 +42,37 @@ const mysqlClient = mysql.createConnection({
 });
 
 const generate = (data) => {
-  Object.keys(data).forEach((clientId) => {
-    const row = [
-      clientId,
-      data[clientId].name,
-    ];
+  const rows = [];
+  async.eachSeries(Object.keys(data), (clientId, callback) => {
+    mysqlClient.query(`SELECT applicationId, loanApplicationStatus FROM loanApplication WHERE clientId = "${clientId}"`, (error, results) => {
+      let statuses = '';
+      results.forEach((result) => {
+        if (statuses.length !== 0) {
+          statuses += '|';
+        }
+        statuses += `${result.applicationId}:${result.loanApplicationStatus}`;
+      });
+      const row = [
+        clientId,
+        data[clientId].name,
+        statuses,
+      ];
 
-    ['1396310400000', '1427846400000', '1459468800000'].forEach((year) => {
-      row.push(data[clientId][year].bankOverDraftCashCreditAc);
-      row.push(data[clientId][year].sDebtors);
-      row.push(data[clientId][year].inventory);
-      row.push(data[clientId][year].costOfSalesRevenueAndPurchases);
-      row.push(data[clientId][year].netSalesRevenue);
+      ['1396310400000', '1427846400000', '1459468800000'].forEach((year) => {
+        row.push(data[clientId][year].bankOverDraftCashCreditAc);
+        row.push(data[clientId][year].sDebtors);
+        row.push(data[clientId][year].inventory);
+        row.push(data[clientId][year].costOfSalesRevenueAndPurchases);
+        row.push(data[clientId][year].netSalesRevenue);
+      });
+      rows.push(row);
+      callback(null, null);
     });
-    writer.write(row);
+  }, () => {
+    rows.forEach((row) => {
+      writer.write(row);
+    });
+    mysqlClient.end();
   });
 };
 
@@ -75,5 +94,4 @@ mysqlClient.query(query, (error, results) => {
     };
   });
   generate(data);
-  mysqlClient.end();
 });
