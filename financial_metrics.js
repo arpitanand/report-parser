@@ -12,16 +12,19 @@ const options = {
     'Applications',
     '2014 - Bank overdraft / cash credit account',
     '2014 - Sundry debtors',
+    '2014 - Sundry creditors',
     '2014 - Inventory',
     '2014 - Cost of sales / revenue & Purchases',
     '2014 - Net sales revenue',
     '2015 - Bank overdraft / cash credit account',
     '2015 - Sundry debtors',
+    '2015 - Sundry creditors',
     '2015 - Inventory',
     '2015 - Cost of sales / revenue & Purchases',
     '2015 - Net sales revenue',
     '2016 - Bank overdraft / cash credit account',
     '2016 - Sundry debtors',
+    '2016 - Sundry creditors',
     '2016 - Inventory',
     '2016 - Cost of sales / revenue & Purchases',
     '2016 - Net sales revenue',
@@ -61,6 +64,7 @@ const generate = (data) => {
       ['1396310400000', '1427846400000', '1459468800000'].forEach((year) => {
         row.push(data[clientId][year].bankOverDraftCashCreditAc);
         row.push(data[clientId][year].sDebtors);
+        row.push(data[clientId][year].sCreditors);
         row.push(data[clientId][year].inventory);
         row.push(data[clientId][year].costOfSalesRevenueAndPurchases);
         row.push(data[clientId][year].netSalesRevenue);
