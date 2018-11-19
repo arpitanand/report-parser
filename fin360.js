@@ -31,7 +31,7 @@ const mysqlClient = mysql.createConnection({
 });
 
 request.get(
-  'https://www.fin360.in/bank-account/api/v1/fetchBankAccountUIDs?access_token=evjjpv940gokghvidajbrnd6ka3mc31g&format=json&daysAgo=1500',
+  'https://www.fin360.in/bank-account/api/v1/fetchBankAccountUIDs?access_token=evjjpv940gokghvidajbrnd6ka3mc31g&format=json&fromDate=01-10-2018&toDate=29-10-2018',
   (error, response, body) => {
     if (!error && response.statusCode === 200) {
       const d = {};
